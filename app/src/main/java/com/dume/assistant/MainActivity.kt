@@ -197,6 +197,11 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
         val service = DumeAccessibilityService.activeService
 
         if (waitingForSendConfirmation) {
+            if (lower == "repeat my message for me" || lower == "repeat my message" || lower == "read my message") {
+                val draft = service?.readFocusedFieldText()
+                return if (draft.isNullOrBlank()) "I can't access the message text in this app."
+                       else "Your message says: $draft"
+            }
             if (lower == "confirm send" || lower == "yes send") {
                 waitingForSendConfirmation = false
                 val success = service?.clickVisibleLabel("send", allowSensitive = true) == true
@@ -257,9 +262,15 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
             lower.contains("who are you") ->
                 return "I am D.U.M-E, your offline Android assistant."
 
+            lower == "repeat my message for me" || lower == "repeat my message" || lower == "read my message" -> {
+                val draft = service?.readFocusedFieldText()
+                return if (draft.isNullOrBlank()) "I can't access the message text in this app."
+                       else "Your message says: $draft"
+            }
+
             lower == "send" || lower == "send message" -> {
                 waitingForSendConfirmation = true
-                return "I am ready to tap the visible Send button. Say 'confirm send' to proceed, or 'cancel' to stop."
+                return "Ready to send. I will not read the message aloud unless you ask me to. Say 'confirm send' to send, or 'cancel' to stop."
             }
 
             lower == "confirm send" || lower == "yes send" ->
