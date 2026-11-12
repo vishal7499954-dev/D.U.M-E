@@ -26,12 +26,14 @@ class DumeWakeService : Service() {
         const val ACTION_STOP = "com.dume.assistant.action.STOP_WAKE"
         private const val CHANNEL_ID = "dume_wake_listener"
         private const val NOTIFICATION_ID = 7101
+        const val EXTRA_COMMAND = "com.dume.assistant.extra.WAKE_COMMAND"
     }
 
     private val handler = Handler(Looper.getMainLooper())
     private var recognizer: SpeechRecognizer? = null
     private var listening = false
     private var active = false
+    private var waitingForCommand = false
 
     override fun onCreate() {
         super.onCreate()
@@ -112,18 +114,31 @@ class DumeWakeService : Service() {
         override fun onResults(results: android.os.Bundle?) {
             listening = false
             val phrases = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).orEmpty()
-            val wakeDetected = phrases.any { phrase ->
-                val normalized = phrase.lowercase(Locale.ROOT)
-                    .replace(Regex("[^a-z0-9 ]"), " ")
-                    .replace(Regex("\\s+"), " ")
-                    .trim()
-                normalized.contains("hey dum e") ||
-                    normalized.contains("hey d u m e") ||
-                    normalized.contains("hey dume") ||
-                    normalized.contains("hey dummy")
-            }
-            if (wakeDetected) {
-                updateNotification("D.U.M-E heard you. Open the app to give your command.")
+            val recognized = phrases.firstOrNull().orEmpty().trim()
+            if (waitingForCommand) {
+                waitingForCommand = false
+                if (recognized.isNotBlank()) {
+                    updateNotification("Command ready: $recognized", recognized)
+                } else {
+                    updateNotification("No command heard. Listening for “Hey D.U.M-E”.")
+                }
+            } else {
+                val wakeDetected = phrases.any { phrase ->
+                    val normalized = phrase.lowercase(Locale.ROOT)
+                        .replace(Regex("[^a-z0-9 ]"), " ")
+                        .replace(Regex("\\s+"), " ")
+                        .trim()
+                    normalized.contains("hey dum e") ||
+                        normalized.contains("hey d u m e") ||
+                        normalized.contains("hey dume") ||
+                        normalized.contains("hey dummy")
+                }
+                if (wakeDetected) {
+                    waitingForCommand = true
+                    updateNotification("D.U.M-E is awake. Say your command now.")
+                    scheduleRestart(250)
+                    return
+                }
             }
             scheduleRestart(650)
         }
@@ -139,6 +154,7 @@ class DumeWakeService : Service() {
     private fun stopListening() {
         active = false
         listening = false
+        waitingForCommand = false
         handler.removeCallbacksAndMessages(null)
         try { recognizer?.cancel() } catch (_: Exception) { }
         try { recognizer?.destroy() } catch (_: Exception) { }
@@ -159,9 +175,13 @@ class DumeWakeService : Service() {
         }
     }
 
-    private fun buildNotification(message: String): Notification {
+    private fun buildNotification(message: String, command: String? = null): Notification {
+        val openIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            if (!command.isNullOrBlank()) putExtra(EXTRA_COMMAND, command)
+        }
         val openApp = PendingIntent.getActivity(
-            this, 1, Intent(this, MainActivity::class.java),
+            this, 1, openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val stopIntent = PendingIntent.getService(
@@ -184,9 +204,9 @@ class DumeWakeService : Service() {
             .build()
     }
 
-    private fun updateNotification(message: String) {
+    private fun updateNotification(message: String, command: String? = null) {
         getSystemService(NotificationManager::class.java)
-            .notify(NOTIFICATION_ID, buildNotification(message))
+            .notify(NOTIFICATION_ID, buildNotification(message, command))
     }
 
     override fun onDestroy() {
