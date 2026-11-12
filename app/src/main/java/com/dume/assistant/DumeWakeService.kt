@@ -63,6 +63,7 @@ class DumeWakeService : Service() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
             !SpeechRecognizer.isOnDeviceRecognitionAvailable(this)) {
             updateNotification("On-device speech recognition is unavailable. Install an offline speech service/language pack.")
+            stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
             return
         }
