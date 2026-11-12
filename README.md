@@ -1,43 +1,33 @@
-# JARVIS Android — starter project
+# D.U.M-E — Offline Android Assistant
 
-This is a real, installable Android starter app for Android 8+ (targeted to Android 12-compatible behavior), styled as a blue holographic JARVIS console.
+D.U.M-E is a privacy-first Android assistant project designed for Android 12 devices, including the Samsung Galaxy M31.
 
-## Included and functional
-- Text-to-speech using the Android system TTS engine (download an offline voice in Android settings).
-- Speech input through Android speech recognition, requesting offline recognition where the installed provider supports it.
-- Local note memory using SharedPreferences (`remember ...`, `recall`, `forget memory`).
-- Battery status.
-- Flashlight on/off.
-- Open installed apps by their exact displayed app name.
-- Open Android Settings.
-- Optional online search.
-- No account, API key, analytics SDK, or network permission is included.
+## Current build: offline foundation
 
-## Important limitations
-This starter does **not** contain a generative language model. Its offline brain is a small command router, not ChatGPT/JARVIS-level conversational AI. Android's speech recognizer may still require a downloaded offline language pack and may ignore the offline preference depending on the device/provider. Text-to-speech works offline only when an offline voice is installed.
+- Native Kotlin Android app.
+- Dark, minimal assistant interface.
+- Local conversation history stored on the device.
+- Short, serious assistant responses.
+- Basic built-in offline commands (help, time, date, battery, remember, recall, clear memory).
+- Android text-to-speech, using the voice installed on the phone.
+- No Internet permission and no cloud API.
 
-A local LLM is the next integration milestone. For a phone with 4 GB RAM or less, test a 0.5B–1.5B quantized GGUF model, not a 7B model. A true integrated LLM requires bundling/building a native inference runtime (for example llama.cpp JNI) and downloading a compatible model separately; it is intentionally not falsely represented as already included here.
+## Important: local AI model status
 
-## Build an APK
-1. Install Android Studio on a computer.
-2. Extract this ZIP.
-3. Open the `JARVIS-Android` folder in Android Studio.
-4. Let Gradle sync. Use JDK 17 if prompted.
-5. Select **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
-6. Find the debug APK under `app/build/outputs/apk/debug/app-debug.apk`.
-7. Transfer it to the Android phone and install it. You may need to allow installation from that file manager.
+This first foundation build is **not yet a generative AI model**. It uses a small offline command-and-response engine. The next milestone is integrating a quantized local language model through a native inference runtime such as llama.cpp. Model compatibility and speed must be tested on the Galaxy M31 before choosing the final model. The model will need to be downloaded once or transferred onto the phone; after setup, inference can run offline.
 
-## Commands
-- `help`
-- `battery`
-- `flashlight on` / `flashlight off`
-- `open Settings` (or exact installed app label)
-- `remember buy milk`
-- `recall`
-- `forget memory`
-- `search weather tomorrow` (online)
+Offline speech recognition is not included yet because Android speech-recognition providers may send audio to a network service even when offline is requested. We will add a verified on-device speech engine separately.
 
-## Privacy and safety
-- Notes are stored locally in app-private preferences.
-- No dangerous permissions for contacts, SMS, calls, accessibility, or device administration are requested.
-- The app does not execute arbitrary AI-generated actions.
+## Build
+
+1. Open this repository in Android Studio.
+2. Use JDK 17.
+3. Let Gradle sync and download the Android Gradle Plugin dependencies.
+4. Select **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
+5. Install the generated debug APK on the Android device.
+
+Minimum Android version: Android 8.0 (API 26). Target SDK: 35.
+
+## Privacy
+
+The app requests no Internet permission. Notes and chat history are stored in app-private local storage. No account, telemetry, analytics, or remote AI service is configured.
