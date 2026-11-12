@@ -75,7 +75,7 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(18), dp(22), dp(18), dp(14))
-            setBackgroundColor(background)
+            setBackgroundColor(this@MainActivity.background)
         }
         val heading = TextView(this).apply {
             text = "D.U.M-E"
@@ -117,7 +117,7 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
 
         val send = Button(this).apply {
             text = "SEND"
-            setTextColor(background)
+            setTextColor(this@MainActivity.background)
             setBackgroundColor(cyan)
             setOnClickListener { submitMessage() }
         }
