@@ -171,6 +171,10 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
             startWakeService()
         } else if (requestCode == 43) {
             reply("Notification permission is needed to show the background microphone status.")
+        } else if (requestCode == 44 && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+            requestNotificationsAndStartListening()
+        } else if (requestCode == 44) {
+            reply("Microphone permission is required for background wake listening.")
         }
     }
 
@@ -187,6 +191,10 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
     }
 
     private fun requestNotificationsAndStartListening() {
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 44)
+            return
+        }
         if (Build.VERSION.SDK_INT >= 33 &&
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 43)
