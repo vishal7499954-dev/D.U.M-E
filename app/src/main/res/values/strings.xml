@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_description">Allows D.U.M-E to scroll and interact with on-screen controls when you explicitly ask it to.</string>
+</resources>
