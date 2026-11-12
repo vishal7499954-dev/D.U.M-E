@@ -53,6 +53,22 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
         buildInterface()
         addMessage("D.U.M-E", "Systems online. Offline foundation active.\nTap VOICE to speak. Phone control needs your permission in Android Settings.")
         restoreHistory()
+        handleWakeCommand(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleWakeCommand(intent)
+    }
+
+    private fun handleWakeCommand(intent: Intent?) {
+        val command = intent?.getStringExtra(DumeWakeService.EXTRA_COMMAND)?.trim()
+        if (!command.isNullOrBlank()) {
+            input.setText(command)
+            submitMessage()
+            intent.removeExtra(DumeWakeService.EXTRA_COMMAND)
+        }
     }
 
     private fun buildInterface() {
