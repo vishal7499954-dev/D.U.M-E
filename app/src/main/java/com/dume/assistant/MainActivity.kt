@@ -257,13 +257,13 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
             lower.contains("who are you") ->
                 return "I am D.U.M-E, your offline Android assistant."
 
-            lower == "send" || lower == "send message" ->
-                return "Before sending, tell me 'send message' again when you are ready."
-
-            lower == "confirm send" || lower == "yes send" -> {
+            lower == "send" || lower == "send message" -> {
                 waitingForSendConfirmation = true
-                return "Please confirm the message. Say 'confirm send' now, or 'cancel'."
+                return "I am ready to tap the visible Send button. Say 'confirm send' to proceed, or 'cancel' to stop."
             }
+
+            lower == "confirm send" || lower == "yes send" ->
+                return "No message is waiting for confirmation. Say 'send message' first when you are ready."
 
             lower in listOf("cancel", "cancel send") -> {
                 waitingForSendConfirmation = false
