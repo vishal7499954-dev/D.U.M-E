@@ -71,6 +71,15 @@ class DumeAccessibilityService : AccessibilityService() {
         return clicked
     }
 
+    fun readFocusedFieldText(): String? {
+        val root = rootInActiveWindow ?: return null
+        val focused = root.findFocus(AccessibilityNodeInfo.FOCUS_INPUT)
+        val value = focused?.text?.toString()?.takeIf { it.isNotBlank() }
+        focused?.recycle()
+        root.recycle()
+        return value
+    }
+
     fun typeIntoFocusedField(text: String): Boolean {
         val root = rootInActiveWindow ?: return false
         val focused = root.findFocus(AccessibilityNodeInfo.FOCUS_INPUT)
