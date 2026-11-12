@@ -42,3 +42,8 @@ The listener looks for "Hey D.U.M-E". After detecting it, it listens for one com
 This is not yet a verified always-on production wake-word engine. Android's speech recognizer may stop, may not provide offline recognition for the selected language, and may be restricted by device battery management. A dedicated local wake-word engine and fully offline speech-to-text engine still need integration and on-device testing.
 
 APK builds are intentionally manual only while development continues.
+
+
+## Dedicated offline wake-word engine
+
+The selected next engine is upstream sherpa-onnx KeywordSpotter with a compact English keyword-spotting model. Its Android native libraries, Kotlin API, and model must be packaged and tested together before the current Android speech-recognition prototype can be replaced. See [the integration plan](docs/WAKE_WORD_ENGINE.md). This is not yet integrated or tested; APK builds remain manual-only and are not being run during feature development.
