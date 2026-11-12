@@ -7,6 +7,9 @@
         </intent>
     </queries>
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="false"
@@ -35,5 +38,11 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
+
+        <service
+            android:name=".DumeWakeService"
+            android:label="D.U.M-E Wake Listener"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
     </application>
 </manifest>
