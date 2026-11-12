@@ -1,8 +1,6 @@
 name: Build D.U.M-E APK
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
