@@ -31,3 +31,14 @@ Minimum Android version: Android 8.0 (API 26). Target SDK: 35.
 ## Privacy
 
 The app requests no Internet permission. Notes and chat history are stored in app-private local storage. No account, telemetry, analytics, or remote AI service is configured.
+
+
+## Background wake-word development
+
+The current background-listener prototype uses Android's on-device SpeechRecognizer when the device provides it. Tap **START LISTENING** while D.U.M-E is open and grant microphone/notification permissions. Android shows an ongoing notification with a Stop action.
+
+The listener looks for "Hey D.U.M-E". After detecting it, it listens for one command and places the recognized command in the notification. Tap that notification to open D.U.M-E and run the command. This tap is intentional: Android restricts apps from silently opening activities over other apps, and commands should not execute unexpectedly while the phone is locked.
+
+This is not yet a verified always-on production wake-word engine. Android's speech recognizer may stop, may not provide offline recognition for the selected language, and may be restricted by device battery management. A dedicated local wake-word engine and fully offline speech-to-text engine still need integration and on-device testing.
+
+APK builds are intentionally manual only while development continues.
