@@ -1,6 +1,7 @@
 package com.dume.assistant
 
 import android.Manifest
+import android.os.Build
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -112,6 +113,10 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
             text = "ENABLE CONTROL"
             setOnClickListener { openAccessibilitySettings() }
         }
+        val wake = Button(this).apply {
+            text = "START LISTENING"
+            setOnClickListener { requestNotificationsAndStartListening() }
+        }
         val controls = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
@@ -123,6 +128,7 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
             gravity = Gravity.CENTER
             addView(mic, LinearLayout.LayoutParams(0, dp(48), 1f))
             addView(control, LinearLayout.LayoutParams(0, dp(48), 1f))
+            addView(wake, LinearLayout.LayoutParams(0, dp(48), 1f))
         }
 
         root.addView(heading)
@@ -161,6 +167,10 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
             launchRecognizer()
         } else if (requestCode == requestAudio) {
             reply("Microphone permission was not granted.")
+        } else if (requestCode == 43 && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+            startWakeService()
+        } else if (requestCode == 43) {
+            reply("Notification permission is needed to show the background microphone status.")
         }
     }
 
@@ -173,6 +183,26 @@ class MainActivity : Activity(), TextToSpeech.OnInitListener {
                 input.setText(spoken)
                 submitMessage()
             }
+        }
+    }
+
+    private fun requestNotificationsAndStartListening() {
+        if (Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 43)
+            return
+        }
+        startWakeService()
+    }
+
+    private fun startWakeService() {
+        val intent = Intent(this, DumeWakeService::class.java).apply { action = DumeWakeService.ACTION_START }
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(intent)
+            else startService(intent)
+            reply("Background listening requested. Keep the persistent D.U.M-E notification visible. Say 'Hey D.U.M-E'.")
+        } catch (_: Exception) {
+            reply("Android did not allow background listening to start. Open D.U.M-E and try again.")
         }
     }
 
